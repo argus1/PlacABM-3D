@@ -867,7 +867,7 @@ void Cell::update_position( double dt )
 	if( default_microenvironment_options.simulate_2D == true )
 	{ velocity[2] = 0.0; }
 	
-	std::vector<double> old_position(position); 
+	// std::vector<double> old_position(position); 
 	axpy( &position , d1 , velocity );  
 	axpy( &position , d2 , previous_velocity );  
 	// overwrite previous_velocity for future use 
