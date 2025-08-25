@@ -608,10 +608,19 @@ Cell* Cell::divide( )
 	normalize( &rand_vec ); 
 	rand_vec *= radius; // multiply direction times the displacement 
 	*/
-	
-	std::vector<double> rand_vec = cell_division_orientation(); 
-	rand_vec = rand_vec- phenotype.geometry.polarity*(rand_vec[0]*state.orientation[0]+ 
-		rand_vec[1]*state.orientation[1]+rand_vec[2]*state.orientation[2])*state.orientation;	
+
+	std::vector<double> rand_vec; 
+	if( this->functions.cell_division_direction_function )
+	{ 
+		rand_vec = this->functions.cell_division_direction_function( this ); 
+	}
+	else
+	{
+		rand_vec = cell_division_orientation(); 
+		rand_vec = rand_vec- phenotype.geometry.polarity*(rand_vec[0]*state.orientation[0]+ 
+			rand_vec[1]*state.orientation[1]+rand_vec[2]*state.orientation[2])*state.orientation;	
+	}
+
 	rand_vec *= phenotype.geometry.radius;
 
 	child->assign_position(position[0] + rand_vec[0],
@@ -1362,6 +1371,7 @@ void Cell::ingest_cell( Cell* pCell_to_eat )
 		pCell_to_eat->functions.update_phenotype = NULL; 
 		pCell_to_eat->functions.contact_function = NULL; 
 		pCell_to_eat->functions.cell_division_function = NULL; 
+		pCell_to_eat->functions.cell_division_direction_function = NULL; 
 		
 		// should set volume fuction to NULL too! 
 		pCell_to_eat->functions.volume_update_function = NULL; 
@@ -1613,6 +1623,7 @@ void Cell::fuse_cell( Cell* pCell_to_fuse )
 		pCell_to_fuse->functions.update_phenotype = NULL; 
 		pCell_to_fuse->functions.contact_function = NULL; 
 		pCell_to_fuse->functions.cell_division_function = NULL; 
+		pCell_to_fuse->functions.cell_division_direction_function = NULL; 
 		pCell_to_fuse->functions.volume_update_function = NULL; 
 
 		// remove all adhesions 
@@ -1653,6 +1664,7 @@ void Cell::lyse_cell( void )
 	functions.update_phenotype = NULL; 
 	functions.contact_function = NULL; 
 	functions.cell_division_function = NULL; 
+	functions.cell_division_direction_function = NULL; 
 	
 	// remove all adhesions 
 	
@@ -1750,6 +1762,13 @@ void display_ptr_as_bool( void (*ptr)(Cell*,Cell*), std::ostream& os )
 	os << "false"; 
 	return;
 }
+void display_ptr_as_bool( std::vector<double> (*ptr)(Cell*), std::ostream& os )
+{
+	if( ptr )
+	{ os << "true"; return; }
+	os << "false"; 
+	return;
+}
 
 void display_cell_definitions( std::ostream& os )
 {
@@ -1835,6 +1854,8 @@ void display_cell_definitions( std::ostream& os )
 		os << "\t\t contact function: "; display_ptr_as_bool( pCF->contact_function , std::cout ); 
 		os << std::endl; 
 		os << "\t\t cell division function: "; display_ptr_as_bool( pCF->cell_division_function , std::cout ); 
+		os << std::endl; 
+		os << "\t\t cell division direction function: "; display_ptr_as_bool( pCF->cell_division_direction_function , std::cout ); 
 		os << std::endl; 
 		
 		// summarize motility 
