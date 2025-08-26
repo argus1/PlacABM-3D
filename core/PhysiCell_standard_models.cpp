@@ -691,7 +691,6 @@ void standard_domain_edge_avoidance_interactions( Cell* pCell, Phenotype& phenot
 	{ pCell->functions.calculate_distance_to_membrane = distance_to_domain_edge; }
 	phenotype.mechanics.cell_BM_repulsion_strength = 100;  
 		
-	double max_interactive_distance = phenotype.mechanics.relative_maximum_adhesion_distance * phenotype.geometry.radius;
 	double distance = pCell->functions.calculate_distance_to_membrane(pCell,phenotype,dt); 
 	//Note that the distance_to_membrane function must set displacement values (as a normal vector)
 		
