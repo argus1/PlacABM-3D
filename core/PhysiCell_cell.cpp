@@ -613,6 +613,7 @@ Cell* Cell::divide( )
 	if( this->functions.cell_division_direction_function )
 	{ 
 		rand_vec = this->functions.cell_division_direction_function( this ); 
+        normalize( &rand_vec );
 	}
 	else
 	{
