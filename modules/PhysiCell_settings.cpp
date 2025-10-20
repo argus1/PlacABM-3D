@@ -65,7 +65,7 @@
 ###############################################################################
 */
 
-#if defined(_WIN32) || defined(_WIN64)
+#ifdef __cpp_lib_filesystem
 #include <filesystem>
 #endif
  
@@ -360,12 +360,9 @@ bool create_directories(const std::string &path)
     return create_directory(path);
 }
 
+#ifdef __cpp_lib_filesystem
 bool create_directory(const std::string &path)
 {
-#if defined(__MINGW32__) || defined(__MINGW64__)
-	bool success = mkdir(path.c_str()) == 0;
-	return success || errno == EEXIST;
-#elif defined(_WIN32) || defined(_WIN64)
 	// Create the directory using C++17 filesystem library
 	std::error_code ec; // To capture any error
 	if (std::filesystem::create_directories(path, ec)) {
@@ -375,11 +372,18 @@ bool create_directory(const std::string &path)
 		return false; // An error occurred
 	}
 	return true; // Directory already exists
+}
+#else
+bool create_directory(const std::string &path)
+{
+#if defined(__MINGW32__) || defined(__MINGW64__)
+	bool success = mkdir(path.c_str()) == 0;
 #else
 	bool success = mkdir(path.c_str(), 0755) == 0;
-	return success || errno == EEXIST;
 #endif
+	return success || errno == EEXIST;
 }
+#endif
 
 void create_output_directory(const std::string& path)
 {
