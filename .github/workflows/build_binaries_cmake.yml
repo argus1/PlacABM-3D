@@ -37,8 +37,8 @@ jobs:
             cpp_compiler: clang++
             build_physiboss: "ON"
           - os: macos-latest
-            c_compiler: gcc
-            cpp_compiler: g++
+            c_compiler: gcc-15
+            cpp_compiler: g++-15
             build_physiboss: "ON"
           # - os: macos-latest
           #   c_compiler: cc
