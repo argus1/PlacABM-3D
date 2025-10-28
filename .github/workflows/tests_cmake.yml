@@ -1,5 +1,3 @@
-# This starter workflow is for a CMake project running on multiple platforms. There is a different starter workflow if you just want a single platform.
-# See: https://github.com/actions/starter-workflows/blob/main/ci/cmake-single-platform.yml
 name: Tests CMake
 
 on:
@@ -9,18 +7,13 @@ on:
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.platform.os }}
 
     strategy:
       # Set fail-fast to false to ensure that feedback is delivered for all matrix combinations. Consider changing this to true when your workflow is stable.
       fail-fast: false
 
-      # Set up a matrix to run the following 3 configurations:
-      # 1. <Windows, Release, latest MSVC compiler toolchain on the default runner image, default generator>
-      # 2. <Linux, Release, latest GCC compiler toolchain on the default runner image, default generator>
-      # 3. <Linux, Release, latest Clang compiler toolchain on the default runner image, default generator>
-      #
-      # To add more build types (Release, Debug, RelWithDebInfo, etc.) customize the build_type list.
+      # Set up a matrix to run cross-product of projects and OS/compiler combinations
       matrix:
         projects: [
           {"physiboss": false, cwd: "build/sample_projects/template", name: "PhysiCell Template", binary: "template", max_time: 120, config: "config/PhysiCell_settings.xml", validation_output_folder: "output_template"},
@@ -41,27 +34,13 @@ jobs:
           {"physiboss": false, cwd: "build/sample_projects/asymmetric_division", name: "PhysiCell asymmetric division", binary: "asymmetric_division", config: "config/PhysiCell_settings.xml", max_time: 120, validation_output_folder: ""},
           {"physiboss": false, cwd: "build/sample_projects/episode", name: "PhysiCell Episode", binary: "episode", max_time: 120, config: "config/PhysiCell_settings.xml", validation_output_folder: ""},
         ]
-        include:
-          - os: windows-latest
-            c_compiler: cl
-            cpp_compiler: cl
-            build_physiboss: "OFF"
-          - os: ubuntu-latest
-            c_compiler: gcc
-            cpp_compiler: g++
-            build_physiboss: "ON"
-          - os: ubuntu-latest
-            c_compiler: clang
-            cpp_compiler: clang++
-            build_physiboss: "ON"
-          - os: macos-latest
-            c_compiler: gcc-15
-            cpp_compiler: g++-15
-            build_physiboss: "ON"
-          # - os: macos-latest
-          #   c_compiler: cc
-          #   cpp_compiler: c++
-          #   build_physiboss: "ON"
+        platform: [
+          {"os": "windows-latest", "c_compiler": "cl", "cpp_compiler": "cl", "build_physiboss": "OFF"},
+          {"os": "ubuntu-latest", "c_compiler": "gcc", "cpp_compiler": "g++", "build_physiboss": "ON"},
+          {"os": "ubuntu-latest", "c_compiler": "clang", "cpp_compiler": "clang++", "build_physiboss": "ON"},
+          {"os": "macos-latest", "c_compiler": "gcc-15", "cpp_compiler": "g++-15", "build_physiboss": "ON"},
+          # {"os": "macos-latest", "c_compiler": "cc", "cpp_compiler": "c++", "build_physiboss": "ON"},
+        ]
 
     steps:
     - uses: actions/checkout@v4
@@ -74,7 +53,7 @@ jobs:
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
 
     - name: Install dependencies (Linux)
-      if: matrix.os == 'ubuntu-latest'
+      if: matrix.platform.os == 'ubuntu-latest'
       run: |
         sudo apt-get update
         sudo apt-get install -y libomp-dev
@@ -84,25 +63,25 @@ jobs:
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
       run: >
         cmake -B ${{ steps.strings.outputs.build-output-dir }}
-        -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
-        -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
+        -DCMAKE_CXX_COMPILER=${{ matrix.platform.cpp_compiler }}
+        -DCMAKE_C_COMPILER=${{ matrix.platform.c_compiler }}
         -DCMAKE_BUILD_TYPE=Release
-        -DPHYSICELL_BUILD_PHYSIBOSS=${{ matrix.build_physiboss }}
+        -DPHYSICELL_BUILD_PHYSIBOSS=${{ matrix.platform.build_physiboss }}
         -S ${{ github.workspace }}
 
     - name: Build
-      if: matrix.projects.physiboss == false || matrix.build_physiboss == 'ON'
+      if: matrix.projects.physiboss == false || matrix.platform.build_physiboss == 'ON'
       # Build your program with the given configuration. Note that --config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
       run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config Release --target ${{ matrix.projects.binary }}
         
     - name: Run ${{ matrix.projects.name }} project
-      if: matrix.projects.physiboss == false || matrix.build_physiboss == 'ON'
+      if: matrix.projects.physiboss == false || matrix.platform.build_physiboss == 'ON'
       run: |
         python ${{ github.workspace }}/beta/test_run_sample.py ${{ matrix.projects.binary }} ${{ matrix.projects.config }} ${{ matrix.projects.max_time }}
       working-directory: ${{ matrix.projects.cwd }}
     
     - name: Check ${{ matrix.projects.name }} project simulation results
-      if: matrix.projects.validation_output_folder != '' && (matrix.projects.physiboss == false || matrix.build_physiboss == 'ON')
+      if: matrix.projects.validation_output_folder != '' && (matrix.projects.physiboss == false || matrix.platform.build_physiboss == 'ON')
       run: |
         python ${{ github.workspace }}/beta/test_diff_svg.py output ${{ github.workspace }}/tests/cases/${{ matrix.projects.validation_output_folder }}
       working-directory: ${{ matrix.projects.cwd }}
