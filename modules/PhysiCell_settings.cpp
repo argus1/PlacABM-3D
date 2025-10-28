@@ -65,6 +65,8 @@
 ###############################################################################
 */
 
+#include <version>
+
 #ifdef __cpp_lib_filesystem
 #include <filesystem>
 #endif
