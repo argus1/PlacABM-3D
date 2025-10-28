@@ -36,10 +36,10 @@ jobs:
             c_compiler: clang
             cpp_compiler: clang++
             build_physiboss: "ON"
-          - os: macos-latest
-            c_compiler: cc
-            cpp_compiler: c++
-            build_physiboss: "ON"
+          # - os: macos-latest
+          #   c_compiler: cc
+          #   cpp_compiler: c++
+          #   build_physiboss: "ON"
 
     steps:
     - uses: actions/checkout@v4
