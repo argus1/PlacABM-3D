@@ -18,4 +18,4 @@ add_custom_command(
   COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different
           ${CMAKE_CURRENT_SOURCE_DIR}/config ${CMAKE_CURRENT_BINARY_DIR}/config)
 
-target_link_libraries(${project} PRIVATE PhysiBoSS)
+target_link_libraries(${project} PRIVATE PhysiBoSS_128n)
