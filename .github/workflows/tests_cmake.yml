@@ -78,12 +78,12 @@ jobs:
         
     - name: Run ${{ matrix.projects.name }} project
       run: |
-        python ${{ github.workspace }}/beta/test_run_sample.py ${{ matrix.projects.binary }} ${{ github.workspace }}/${{ matrix.projects.cwd }}/${{ matrix.projects.config }} ${{ matrix.projects.max_time }}
+        python ${{ github.workspace }}/beta/test_run_sample.py ${{ matrix.projects.binary }} ${{ matrix.projects.config }} ${{ matrix.projects.max_time }}
       working-directory: ${{ matrix.projects.cwd }}
     
     - name: Check ${{ matrix.projects.name }} project simulation results
       if: matrix.projects.validation_output_folder != ''
       run: |
-        python ${{ github.workspace }}/beta/test_diff_svg.py output ${{ github.workspace }}/tests/cases/${{ matrix.projects.validation_output_folder }}
+        python ${{ github.workspace }}/beta/test_diff_svg.py output tests/cases/${{ matrix.projects.validation_output_folder }}
       working-directory: ${{ matrix.projects.cwd }}
       

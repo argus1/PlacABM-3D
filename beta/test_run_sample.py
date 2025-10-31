@@ -32,6 +32,8 @@ def disable_automated_spring_adhesions(root):
 def run_sample(myexec, xml_file, max_time):
 
     print("\n\n------------   ",myexec, "   ----------------------------------")
+    # Normalize path to work cross-platform
+    xml_file = os.path.normpath(xml_file)
     # update max_time and omp_num_threads (=1)
     tree = ET.parse(xml_file)
     root = tree.getroot()
