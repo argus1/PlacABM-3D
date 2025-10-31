@@ -11,8 +11,8 @@ if (len(sys.argv) < 3):
   print("e.g.:  python test_diff_svg.py ~/blah1 ~/blah2")
   exit(1)
 else:
-   dir1 = os.path.normpath(sys.argv[1])
-   dir2 = os.path.normpath(sys.argv[2])
+   dir1 = sys.argv[1]
+   dir2 = sys.argv[2]
 
 svg_files = glob.glob(f'{dir1}/snap*.svg')
 svg_files.sort()
