@@ -18,7 +18,6 @@ option(PHYSICELL_BUILD_DFBA "Build dFBA addon" OFF)
 # Main libraries and modules
 add_subdirectory(BioFVM)
 add_subdirectory(core)
-add_subdirectory(custom_modules)
 add_subdirectory(modules)
 
 # Examples and sample projects
