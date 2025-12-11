@@ -15,7 +15,7 @@ target_include_directories(${project} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../..)
 add_custom_command(
   TARGET ${project}
   POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different
+  COMMAND ${CMAKE_COMMAND} -E copy_directory
           ${CMAKE_CURRENT_SOURCE_DIR}/config ${CMAKE_CURRENT_BINARY_DIR}/config)
 
 target_link_libraries(${project} PRIVATE PhysiBoSS)
