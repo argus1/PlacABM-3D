@@ -40,3 +40,8 @@ target_include_directories(libRoadrunner
 target_link_directories(libRoadrunner PUBLIC ${roadrunner_SOURCE_DIR}/lib)
 target_link_libraries(libRoadrunner PUBLIC roadrunner_c_api)
 target_compile_definitions(libRoadrunner PUBLIC ADDON_ROADRUNNER)
+
+find_package(OpenMP 4)
+if(OpenMP_CXX_FOUND)
+  target_link_libraries(libRoadrunner PUBLIC OpenMP::OpenMP_CXX)
+endif()

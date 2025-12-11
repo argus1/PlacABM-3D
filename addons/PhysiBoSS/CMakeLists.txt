@@ -44,6 +44,10 @@ function(create_physiboss_target MAX_NODES)
   target_link_libraries(${TARGET_NAME} PUBLIC ${MABOSS_LIB_NAME})
   target_compile_definitions(${TARGET_NAME} PUBLIC MAXNODES=${MAX_NODES}
                                                    ADDON_PHYSIBOSS)
+  find_package(OpenMP 4)
+  if(OpenMP_CXX_FOUND)
+    target_link_libraries(${TARGET_NAME} PUBLIC OpenMP::OpenMP_CXX)
+  endif()
 endfunction(create_physiboss_target)
 
 create_physiboss_target(64)
