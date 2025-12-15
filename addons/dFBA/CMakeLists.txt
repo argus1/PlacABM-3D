@@ -48,7 +48,5 @@ target_link_libraries(
          LibXml2::LibXml2)
 target_compile_definitions(dFBA PUBLIC ADDON_PHYSIDFBA)
 
-find_package(OpenMP 4)
-if(OpenMP_CXX_FOUND)
-  target_link_libraries(dFBA PUBLIC OpenMP::OpenMP_CXX)
-endif()
+find_package(OpenMP REQUIRED)
+target_link_libraries(dFBA PUBLIC OpenMP::OpenMP_CXX)

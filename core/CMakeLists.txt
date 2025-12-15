@@ -31,8 +31,6 @@ target_sources(
           PhysiCell_standard_models.cpp
           PhysiCell_utilities.cpp)
 
-find_package(OpenMP 4)
-if(OpenMP_CXX_FOUND)
-  target_link_libraries(PhysiCell-core PUBLIC OpenMP::OpenMP_CXX)
-  target_link_libraries(PhysiCell-core-no-addon PUBLIC OpenMP::OpenMP_CXX)
-endif()
+find_package(OpenMP REQUIRED)
+target_link_libraries(PhysiCell-core PUBLIC OpenMP::OpenMP_CXX)
+target_link_libraries(PhysiCell-core-no-addon PUBLIC OpenMP::OpenMP_CXX)

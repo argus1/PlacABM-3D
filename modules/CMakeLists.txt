@@ -27,8 +27,6 @@ target_sources(
           PhysiCell_SVG.cpp
           PhysiCell_various_outputs.cpp)
 
-find_package(OpenMP 4)
-if(OpenMP_CXX_FOUND)
-  target_link_libraries(PhysiCell-modules PUBLIC OpenMP::OpenMP_CXX)
-  target_link_libraries(PhysiCell-modules-no-addon PUBLIC OpenMP::OpenMP_CXX)
-endif()
+find_package(OpenMP REQUIRED)
+target_link_libraries(PhysiCell-modules PUBLIC OpenMP::OpenMP_CXX)
+target_link_libraries(PhysiCell-modules-no-addon PUBLIC OpenMP::OpenMP_CXX)
