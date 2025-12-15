@@ -1354,34 +1354,7 @@ int resume_from_MultiCellDS(std::string folder_path, std::string xml_filename, b
         return -1;
     }
 
-    // Let's confirm the last cell param, before the custom data vars, is what we expect.
-    // If/when this labels list is modified, this code will need to be updated.
-
-    std::string label_path = "//cellular_information//cell_populations//custom//simplified_data//labels//label[@index=99]";
-    std::cout << "\nreading " << label_path << std::endl;
-    // xpath_node = doc.select_node(label_path);   // not allowed
-
-                // <label index="99" size="1" units="1/min">damage_repair_rate</label>
-                // <label index="100" size="1" units="dimensionless">sample</label>
-    // xpath_node = doc.select_node("//cellular_information//cell_populations//custom//simplified_data//labels//label[@index=99]");
-    // node = xpath_node.node();
-    // if (node)
-    // {
-    //     std::cout << "\n   Success!\n" << std::endl;
-    // }
-    // else
-    // {
-    //     std::cout << "\n --- Error reading node\n" << std::endl;
-    //     return -1;
-    // }
-    // std::string last_var = xml_get_my_string_value(node);
-    // std::cout << "last_var= " << last_var << std::endl;
-    // if (last_var != "damage_repair_rate")
-    // {
-    //     std::cout << "\n   Error: last var should be 'damage_repair_rate'\n" << std::endl;
-    //     return -1;
-    // }
-
+    // read/skip over all labels until the last one, damage_repair_rate, so we can parse custom data vars
     xpath_node = doc.select_node("//cellular_information//cell_populations//custom//simplified_data//labels//label[@index=0]");
     node = xpath_node.node();
     if (!node)
