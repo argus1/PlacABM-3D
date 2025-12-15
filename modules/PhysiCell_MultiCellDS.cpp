@@ -2146,7 +2146,10 @@ int recreate_sim_state(std::string filename, Microenvironment& M,
                 // if it exists, overwrite 
                 if( idx_var > -1 )
                 { 
-                    pCell->custom_data.variables[idx_var].value = pair.second; 
+                    // pCell->custom_data.variables[idx_var].value = pair.second; 
+                    pCell->custom_data.variables[idx_var].value = dTemp; 
+                    if (debug_print)
+                    { std::cout << "   ----   pCell->custom_data[" << pair.first << "] = " <<pCell->custom_data[pair.first] << std::endl; }
                 }
                 else
                 {
