@@ -4,6 +4,7 @@
 * does not handle intracellular model state
 * does not currently recover "output*_graph.txt" data; rather relies on the next mechanics step to recreate the information
 * if a model relies on global data generated in custom C++ code that is not captured in the MultiCellDS data, it cannot be recovered
+* an agent's `is_movable` flag is not currently saved in the MultiCellDS (.mat), so it will not be recovered
 
 Normal simulation:
 
