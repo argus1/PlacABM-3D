@@ -86,57 +86,80 @@ using namespace PhysiCell;
 //-----------------------------------------
 int main( int argc, char* argv[] )
 {
-	// load and parse settings file(s)
+    // load and parse settings file(s)
 	
-	bool XML_status = false; 
-	char copy_command [1024]; 
+    bool XML_status = false; 
+    char copy_command [1024]; 
+    bool resume_from_checkpoint = false;
     std::string resume_from_dir;
     std::string resume_from_file;
     int next_full_index, next_svg_index;
 
-    // std::cout << "argc = " << argc << "argv=" << argv << std::endl;
-	if( argc < 5 )
-	{
-        std::cout << "\n Too few arguments. Usage: <.xml config file> <resume_folder> <resume_file> <next_full_index> <next_svg_index>" << std::endl;
-        std::cout << " e.g. config/PhysiCell_settings.xml output output00000042.xml" << std::endl;
-	    exit(-1);
+    std::cout << "argc = " << argc << ", argv[0]=" << argv[0] << std::endl;
+    if( argc == 6 )
+    {
+        resume_from_checkpoint = true;
 
-		XML_status = load_PhysiCell_config_file( argv[1] ); 
-	    if( !XML_status )
-	    { exit(-1); }
+        XML_status = load_PhysiCell_config_file( argv[1] ); 
+        if( !XML_status )
+        { exit(-1); }
 
-		sprintf( copy_command , "cp %s %s" , argv[1] , PhysiCell_settings.folder.c_str() ); 
-	    // copy config file to output directry 
-	    system( copy_command ); 
+        sprintf( copy_command , "cp %s %s" , argv[1] , PhysiCell_settings.folder.c_str() ); 
+        // copy config file to output directry 
+        system( copy_command ); 
 
         resume_from_dir = argv[2];
         resume_from_file = argv[3];
 
         next_full_index = std::stoi(argv[4]);
         next_svg_index = std::stoi(argv[5]);
-	}
-	
-	// OpenMP setup
-	omp_set_num_threads(PhysiCell_settings.omp_num_threads);
-	
-	// time setup 
-	std::string time_units = "min"; 
+    }
+    else if( argc == 2 )
+    {
+        XML_status = load_PhysiCell_config_file( argv[1] ); 
+        sprintf( copy_command , "cp %s %s" , argv[1] , PhysiCell_settings.folder.c_str() ); 
+    }
+    else if ( argc < 2 )
+    {
+        XML_status = load_PhysiCell_config_file( "./config/PhysiCell_settings.xml" );
+        sprintf( copy_command , "cp ./config/PhysiCell_settings.xml %s" , PhysiCell_settings.folder.c_str() ); 
+    }
+    else 
+    {
+        std::string err_msg =  "\nIncorrect arguments. Usage options: \n"
+        "- no args: will try to use   ./config/PhysiCell_settings.xml\n"
+        "- 1 arg: will try to use it as the config file\n"
+        "- 5 args to resume a simulation:\n"
+        " <.xml config file> <resume_folder> <resume_file> <next_full_index> <next_svg_index>\n";
 
-	/* Microenvironment setup */ 
-	setup_microenvironment(); // modify this in the custom code 
+        std::cout << err_msg << std::endl;
+        std::cout << " e.g. config/PhysiCell_settings.xml  output  output00000042.xml  43 43\n" << std::endl;
+        exit(-1);
+    }
 
-	/* PhysiCell setup */ 
-	// set mechanics voxel size, and match the data structure to BioFVM
-	double mechanics_voxel_size = 30; 
-	Cell_Container* cell_container = create_cell_container_for_microenvironment( microenvironment, mechanics_voxel_size );
-	
-	/* Users typically start modifying here. START USERMODS */ 
-	
-	create_cell_types();
+    if( !XML_status )
+    { exit(-1); }
+
+    // OpenMP setup
+    omp_set_num_threads(PhysiCell_settings.omp_num_threads);
+
+    // time setup 
+    std::string time_units = "min"; 
+
+    // Microenvironment setup 
+    setup_microenvironment(); // modify this in the custom code 
+
+    // PhysiCell setup 
+    // set mechanics voxel size, and match the data structure to BioFVM
+    double mechanics_voxel_size = 30; 
+    Cell_Container* cell_container = create_cell_container_for_microenvironment( microenvironment, mechanics_voxel_size );
+
+    // Users typically start modifying here. START USERMODS 
+
+    create_cell_types();
 
 
     //---------
-    bool resume_from_checkpoint = true;
     if ( !resume_from_checkpoint )
     {
         setup_tissue();
@@ -150,6 +173,7 @@ int main( int argc, char* argv[] )
 
         // int resume_from_MultiCellDS(std::string folder_path, std::string xml_filename, bool create_cells = true, bool debug_print = false);
         int retval = resume_from_MultiCellDS(resume_from_dir, resume_from_file);
+        // int retval = resume_from_MultiCellDS(resume_from_dir, resume_from_file, true, true);
 
         // Another option: don't recreate state, but print out state of cells
         // int retval = resume_from_MultiCellDS(resume_from_dir, resume_from_file, false, true);
@@ -167,46 +191,46 @@ int main( int argc, char* argv[] )
         PhysiCell_globals.SVG_output_index = next_svg_index;
     }
 
-	/* Users typically stop modifying here. END USERMODS */ 
+    // Users typically stop modifying here. END USERMODS 
 	
-	// set MultiCellDS save options 
+    // set MultiCellDS save options 
 
-	set_save_biofvm_mesh_as_matlab( true ); 
-	set_save_biofvm_data_as_matlab( true ); 
-	set_save_biofvm_cell_data( true ); 
-	set_save_biofvm_cell_data_as_custom_matlab( true );
-	
-	// save a simulation snapshot 
-	
-	char filename[1024];
-	sprintf( filename , "%s/initial" , PhysiCell_settings.folder.c_str() ); 
-	save_PhysiCell_to_MultiCellDS_v2( filename , microenvironment , PhysiCell_globals.current_time ); 
-	
-	// save a quick SVG cross section through z = 0, after setting its 
-	// length bar to 200 microns 
+    set_save_biofvm_mesh_as_matlab( true ); 
+    set_save_biofvm_data_as_matlab( true ); 
+    set_save_biofvm_cell_data( true ); 
+    set_save_biofvm_cell_data_as_custom_matlab( true );
 
-	PhysiCell_SVG_options.length_bar = 200; 
+    // save a simulation snapshot 
+
+    char filename[1024];
+    sprintf( filename , "%s/initial" , PhysiCell_settings.folder.c_str() ); 
+    save_PhysiCell_to_MultiCellDS_v2( filename , microenvironment , PhysiCell_globals.current_time ); 
+
+    // save a quick SVG cross section through z = 0, after setting its 
+    // length bar to 200 microns 
+
+    PhysiCell_SVG_options.length_bar = 200; 
 
     // for simplicity, set a pathology coloring function 
-	
-	std::vector<std::string> (*cell_coloring_function)(Cell*) = my_coloring_function;
-	std::string (*substrate_coloring_function)(double, double, double) = paint_by_density_percentage;
 
-	sprintf( filename , "%s/initial.svg" , PhysiCell_settings.folder.c_str() ); 
-	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
-	
-	sprintf( filename , "%s/legend.svg" , PhysiCell_settings.folder.c_str() ); 
-	create_plot_legend( filename , cell_coloring_function ); 
-	
-	display_citations(); 
-	
-	// set the performance timers 
+    std::vector<std::string> (*cell_coloring_function)(Cell*) = my_coloring_function;
+    std::string (*substrate_coloring_function)(double, double, double) = paint_by_density_percentage;
 
-	BioFVM::RUNTIME_TIC();
-	BioFVM::TIC();
-	
-	std::ofstream report_file;
-	if( PhysiCell_settings.enable_legacy_saves == true )
+    sprintf( filename , "%s/initial.svg" , PhysiCell_settings.folder.c_str() ); 
+    SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
+
+    sprintf( filename , "%s/legend.svg" , PhysiCell_settings.folder.c_str() ); 
+    create_plot_legend( filename , cell_coloring_function ); 
+
+    display_citations(); 
+
+    // set the performance timers 
+
+    BioFVM::RUNTIME_TIC();
+    BioFVM::TIC();
+
+    std::ofstream report_file;
+    if( PhysiCell_settings.enable_legacy_saves == true )
 	{	
 		sprintf( filename , "%s/simulation_report.txt" , PhysiCell_settings.folder.c_str() ); 
 		
