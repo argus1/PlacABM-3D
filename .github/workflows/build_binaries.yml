@@ -147,13 +147,13 @@ jobs:
         make clean
         ${{ matrix.projects.extra_run }}
         make PHYSICELL_CPP=g++-14 static
-        cp ${{ matrix.projects.binary }} ${{ matrix.projects.binary }}_macos_intel
+        cp ${{ matrix.projects.binary }} ${{ matrix.projects.short_name }}_macos_intel
 
     - name: Caching produced project binary 
       uses: actions/cache@v4
       with:
         path: |
-          ${{ github.workspace }}/${{ matrix.projects.binary }}_macos_intel
+          ${{ github.workspace }}/${{ matrix.projects.short_name }}_macos_intel
         key: ${{ runner.os }}-macos-intel-${{ github.run_id }}
     
     - name: Look at the generated binary
@@ -197,13 +197,13 @@ jobs:
         make clean
         ${{ matrix.projects.extra_run }}
         make PHYSICELL_CPP=g++-14 static
-        cp ${{ matrix.projects.binary }} ${{ matrix.projects.binary }}_macos_arm
+        cp ${{ matrix.projects.binary }} ${{ matrix.projects.short_name }}_macos_arm
    
     - name: Caching produced project binary 
       uses: actions/cache@v4
       with:
         path: |
-          ${{ github.workspace }}/${{ matrix.projects.binary }}_macos_arm
+          ${{ github.workspace }}/${{ matrix.projects.short_name }}_macos_arm
         key: ${{ runner.os }}-macos-arm-${{ github.run_id }}
       
     - name: Look at the generated binary
@@ -237,19 +237,19 @@ jobs:
       uses: actions/cache@v4
       with:
         path: |
-          ${{ github.workspace }}/${{ matrix.projects.binary }}_macos_arm
+          ${{ github.workspace }}/${{ matrix.projects.short_name }}_macos_arm
         key: ${{ runner.os }}-macos-arm-${{ github.run_id }}
     
     - name: Caching produced project binary 
       uses: actions/cache@v4
       with:
         path: |
-          ${{ github.workspace }}/${{ matrix.projects.binary }}_macos_intel
+          ${{ github.workspace }}/${{ matrix.projects.short_name }}_macos_intel
         key: ${{ runner.os }}-macos-intel-${{ github.run_id }}
     
     - name: Creating universal binary
       run: | 
-        lipo -create -output ${{ matrix.projects.binary }} ${{ matrix.projects.binary }}_macos_arm ${{ matrix.projects.binary }}_macos_intel
+        lipo -create -output ${{ matrix.projects.binary }} ${{ matrix.projects.short_name }}_macos_arm ${{ matrix.projects.short_name }}_macos_intel
     - name: Checking universal binary
       run: |
         lipo -archs ${{ matrix.projects.binary }}
