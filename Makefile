@@ -49,7 +49,7 @@ PhysiCell_pugixml.o PhysiCell_settings.o PhysiCell_geometry.o
 
 # put your custom objects here (they should be in the custom_modules directory)
 
-PhysiCell_custom_module_OBJECTS := .o
+PhysiCell_custom_module_OBJECTS := custom.o placabm_setup.o placabm_substrates.o
 
 pugixml_OBJECTS := pugixml.o
 
@@ -63,6 +63,12 @@ EXAMPLES := ./examples/PhysiCell_test_mechanics_1.cpp ./examples/PhysiCell_test_
 all: 
 	make heterogeneity-sample
 	make 
+
+placabm-phase1: main.cpp $(ALL_OBJECTS)
+	$(COMPILE_COMMAND) -o placabm_phase1 $(ALL_OBJECTS) main.cpp
+	@echo ""
+	@echo "Executable name is placabm_phase1"
+	@echo ""
 
 name:
 	@echo ""
@@ -418,6 +424,15 @@ PhysiCell_geometry.o: ./modules/PhysiCell_geometry.cpp
 	$(COMPILE_COMMAND) -c ./modules/PhysiCell_geometry.cpp 
 
 # user-defined PhysiCell modules
+
+custom.o: ./custom_modules/custom.cpp
+	$(COMPILE_COMMAND) -c ./custom_modules/custom.cpp
+
+placabm_substrates.o: ./custom_modules/placabm_substrates.cpp
+	$(COMPILE_COMMAND) -c ./custom_modules/placabm_substrates.cpp
+
+placabm_setup.o: ./custom_modules/placabm_setup.cpp
+	$(COMPILE_COMMAND) -c ./custom_modules/placabm_setup.cpp
 
 # cleanup
 
